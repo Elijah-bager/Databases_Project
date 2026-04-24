@@ -1,0 +1,75 @@
+-- ============================================================
+--  Create.txt  --  SQLite DDL for Workout Tracking Database
+-- ============================================================
+
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS User (
+    Id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name     TEXT    NOT NULL,
+    Email    TEXT    NOT NULL UNIQUE,
+    Password TEXT    NOT NULL,
+    Age      INTEGER NOT NULL CHECK (Age > 0),
+    Weight   REAL    NOT NULL CHECK (Weight > 0),
+    Height   REAL    NOT NULL CHECK (Height > 0),
+    JoinDate TEXT    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Exercise (
+    Id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name            TEXT    NOT NULL UNIQUE,
+    Type            TEXT    NOT NULL CHECK (Type IN ('Strength', 'Cardio')),
+    CalorieBurnRate REAL    NOT NULL CHECK (CalorieBurnRate > 0)
+);
+
+CREATE TABLE IF NOT EXISTS MuscleGroup (
+    Id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    Name        TEXT    NOT NULL UNIQUE,
+    Description TEXT    NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Workout (
+    Id       INTEGER PRIMARY KEY AUTOINCREMENT,
+    UserId   INTEGER NOT NULL,
+    DateTime TEXT    NOT NULL,
+    FOREIGN KEY (UserId) REFERENCES User(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS WorkoutExercise (
+    Id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    WorkoutId  INTEGER NOT NULL,
+    ExerciseId INTEGER NOT NULL,
+    FOREIGN KEY (WorkoutId)  REFERENCES Workout(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (ExerciseId) REFERENCES Exercise(Id)
+        ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS StrengthDetails (
+    WorkoutExerciseId INTEGER PRIMARY KEY,
+    Sets              INTEGER NOT NULL CHECK (Sets > 0),
+    Reps              INTEGER NOT NULL CHECK (Reps > 0),
+    Weight            REAL    NOT NULL CHECK (Weight > 0),
+    FOREIGN KEY (WorkoutExerciseId) REFERENCES WorkoutExercise(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS CardioDetails (
+    WorkoutExerciseId INTEGER PRIMARY KEY,
+    Duration          REAL    NOT NULL CHECK (Duration > 0),
+    Distance          REAL    NOT NULL CHECK (Distance > 0),
+    FOREIGN KEY (WorkoutExerciseId) REFERENCES WorkoutExercise(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS ExerciseMuscleGroup (
+    Id            INTEGER PRIMARY KEY AUTOINCREMENT,
+    ExerciseId    INTEGER NOT NULL,
+    MuscleGroupId INTEGER NOT NULL,
+    UNIQUE (ExerciseId, MuscleGroupId),
+    FOREIGN KEY (ExerciseId)    REFERENCES Exercise(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (MuscleGroupId) REFERENCES MuscleGroup(Id)
+        ON DELETE CASCADE ON UPDATE CASCADE
+);
