@@ -99,11 +99,33 @@ def main():
         print(row)
 
     q = query(connection)
-    print("Query 1: Users who lifted more than 100 pounds:")
-    q.execute_query_one()
-    print("\nQuery 2: Muscle groups and their exercises:")
-    q.execute_query_two()
-    print("\nQuery 3: Total distance covered by each user:")
-    q.execute_query_three()
+    while True:
+        print("\nWhich query would you like to run?")
+        print("1. Users who lifted more than 100 pounds")
+        print("2. Muscle groups and their exercises")
+        print("3. Total distance covered by each user")
+        print("4. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == "1":
+            print("\nQuery 1: Users who lifted more than 100 pounds:")
+            q.execute_query_one()
+
+        elif choice == "2":
+            print("\nQuery 2: Muscle groups and their exercises:")
+            q.execute_query_two()
+
+        elif choice == "3":
+            print("\nQuery 3: Total distance covered by each user:")
+            q.execute_query_three()
+
+        elif choice == "4":
+            print("Exiting program.")
+            break
+
+        else:
+            print("Invalid choice. Please enter 1, 2, 3, or 4.")
+
     connection.close()
 if __name__ == "__main__":    main()
