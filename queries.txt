@@ -1,0 +1,111 @@
+-- Query 0
+-- List all workouts for a user (by UserId).
+
+SELECT Id, DateTime
+FROM Workout
+WHERE UserId = ?
+ORDER BY DateTime;
+
+
+-- Query 1
+-- Retrieve the names of all users and the dates of their workouts
+-- where they performed a strength exercise with a weight greater than 100.
+
+SELECT u.Name, w.DateTime, e.Name AS ExerciseName, sd.Weight
+FROM User u
+JOIN Workout w
+  ON u.Id = w.UserId
+JOIN WorkoutExercise we
+  ON w.Id = we.WorkoutId
+JOIN Exercise e
+  ON we.ExerciseId = e.Id
+JOIN StrengthDetails sd
+  ON we.Id = sd.WorkoutExerciseId
+WHERE sd.Weight > 100;
+
+
+-- Query 2
+-- Retrieve each muscle group and the names of exercises that target that muscle group.
+
+SELECT mg.Name AS MuscleGroupName, e.Name AS ExerciseName
+FROM MuscleGroup mg
+JOIN ExerciseMuscleGroup emg
+  ON mg.Id = emg.MuscleGroupId
+JOIN Exercise e
+  ON emg.ExerciseId = e.Id
+ORDER BY mg.Name, e.Name;
+
+
+-- Query 3
+-- For each user, find the total cardio distance they have completed across all workouts.
+
+SELECT u.Id, u.Name, SUM(cd.Distance) AS TotalDistance
+FROM User u
+JOIN Workout w
+  ON u.Id = w.UserId
+JOIN WorkoutExercise we
+  ON w.Id = we.WorkoutId
+JOIN CardioDetails cd
+  ON we.Id = cd.WorkoutExerciseId
+GROUP BY u.Id, u.Name
+ORDER BY TotalDistance DESC;
+
+
+-- Query 4
+-- List all exercises (Id, Name, Strength/Endurance).
+
+SELECT Id, Name,
+  CASE WHEN Type = 'Cardio' THEN 'Endurance' ELSE Type END AS ExerciseType
+FROM Exercise
+ORDER BY Id;
+
+
+-- Query 5
+-- Add a user.
+
+INSERT INTO User (Name, Email, Password, Age, Weight, Height, JoinDate)
+VALUES (?, ?, ?, ?, ?, ?, ?);
+
+
+-- Query 6
+-- Add a workout.
+
+INSERT INTO Workout (UserId, DateTime)
+VALUES (?, ?);
+
+
+-- Query 7
+-- Add an exercise to a workout.
+
+INSERT INTO WorkoutExercise (WorkoutId, ExerciseId)
+VALUES (?, ?);
+
+-- If the exercise is a strength exercise:
+INSERT INTO StrengthDetails (WorkoutExerciseId, Sets, Reps, Weight)
+VALUES (?, ?, ?, ?);
+
+-- If the exercise is a cardio exercise:
+INSERT INTO CardioDetails (WorkoutExerciseId, Duration, Distance)
+VALUES (?, ?, ?);
+
+
+-- Query 8
+-- Get a specific workout's information.
+
+SELECT w.Id, w.DateTime, u.Id, u.Name, u.Email
+FROM Workout w
+JOIN User u
+  ON u.Id = w.UserId
+WHERE w.Id = ?;
+
+SELECT we.Id AS WorkoutExerciseId, e.Id AS ExerciseId, e.Name, e.Type,
+  sd.Sets, sd.Reps, sd.Weight, cd.Duration, cd.Distance
+FROM WorkoutExercise we
+JOIN Exercise e
+  ON e.Id = we.ExerciseId
+LEFT JOIN StrengthDetails sd
+  ON sd.WorkoutExerciseId = we.Id
+LEFT JOIN CardioDetails cd
+  ON cd.WorkoutExerciseId = we.Id
+WHERE we.WorkoutId = ?
+ORDER BY we.Id;

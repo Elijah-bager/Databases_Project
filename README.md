@@ -1,5 +1,11 @@
 # Databases_Project
 
+## Submission
+
+2a. `3241CreateM2.txt` and `3241PopulateM2.txt`
+2b. `queries.txt`
+2c. `main.py`
+
 ## How to run
 
 First, `cd` into the project directory and run the project. Before running other queries, run the `10. Create and Populate the database` query to create a sqlite database using the `3241CreateM2.txt` and `3241PopulateM2.txt` files.
